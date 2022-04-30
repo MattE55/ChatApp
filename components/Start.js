@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, Pressable, ImageBackground, TouchableOpacity, TextInput,} from 'react-native';
 
-// Importing the default background image from the assets folder
+// Importing the default background image
 import BackgroundImage from "../img/Background_Image.png";
 
 
@@ -57,7 +57,6 @@ export default class Start extends React.Component {
               </Text>
             </View>
 
-            {/* All the colors to change the background are here! */}
             <View style={styles.colorArray}>
               <TouchableOpacity
                 style={styles.color1}
@@ -77,7 +76,6 @@ export default class Start extends React.Component {
               ></TouchableOpacity>
             </View>
 
-            {/*This will allow the user to click on a button and be redirected to the chat page */}
             <Pressable
               style={styles.button}
               onPress={() =>
@@ -96,7 +94,7 @@ export default class Start extends React.Component {
   }
 }
 
-// Creating the app's stylesheet, fixing sizes, centering items, changing colors
+// Creating the app's stylesheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
