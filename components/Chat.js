@@ -46,7 +46,7 @@ export default class Chat extends React.Component {
     //auth
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        firebase.auth().signInAnonymously();
+        await firebase.auth().signInAnonymously();
       }
       this.setState({
         uid: user.uid,
@@ -75,7 +75,7 @@ export default class Chat extends React.Component {
       }
     });
 
-    this.unsubscribe = this.referenceChatMesssages
+    this.unsubscribe = this.referenceChatMessages
       .orderBy("createdAt", "desc")
       .onSnapshot(this.onCollectionUpdate);
     });
