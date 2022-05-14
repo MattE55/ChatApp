@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, Platform, KeyboardAvoidingView } from 'react-native';
-import { GiftedChat, Bubble} from 'react-native-gifted-chat';
+import { GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 import * as firebase from 'firebase';
 import "firebase/firestore";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
-
-//const firebase = require('firebase');
-//require('firebase/firestore');
 
 export default class Chat extends React.Component {
   constructor() {
@@ -18,7 +17,8 @@ export default class Chat extends React.Component {
         _id: "",
         name: "",
         avatar: "",
-      }
+      },
+      isConnected: false
     }
 
   //information for the database
@@ -39,11 +39,53 @@ export default class Chat extends React.Component {
   this.referenceChatMessages = firebase.firestore().collection("messages");
   }
 
+  // Retrieve messages from async storage
+  async getMessages() {
+    let messages = '';
+    try {
+      messages = await AsyncStorage.getItem('messages') || [];
+      this.setState({
+        messages: JSON.parse(messages)
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  // Save messages to async storage
+  async saveMessages() {
+    try {
+      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  // Delete messages from async storage (for development purposes only)
+  async deleteMessages() {
+    try {
+      await AsyncStorage.removeItem('messages');
+      this.setState({
+        messages: []
+      })
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   componentDidMount() {
     let name = this.props.route.params.name;
     this.props.navigation.setOptions({ title: name });
 
-    //auth
+    NetInfo.fetch().then(connection => {
+      if (connection.isConnected) {
+        console.log('online');
+      } else {
+        console.log('offline');
+      }
+    });
+
+    // user authentication
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
         await firebase.auth().signInAnonymously();
@@ -131,6 +173,17 @@ export default class Chat extends React.Component {
         }}
       />
     )
+  }
+
+  renderInputToolbar(props) {
+    if (this.state.isConnected == false) {
+    } else {
+      return(
+        <InputToolbar
+        {...props}
+        />
+      );
+    }
   }
 
   render() {
