@@ -61,7 +61,7 @@ export default class Chat extends React.Component {
     }
   }
 
-  // Delete messages from async storage (for development purposes only)
+  // Delete messages from async storage 
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem('messages');
