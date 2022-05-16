@@ -80,47 +80,55 @@ export default class Chat extends React.Component {
     NetInfo.fetch().then(connection => {
       if (connection.isConnected) {
         console.log('online');
-      } else {
-        console.log('offline');
-      }
-    });
-
-    // user authentication
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
-      this.setState({
-        uid: user.uid,
-        messages: [
-          {
-            _id: 1,
-            text: 'Hello developer',
-            createdAt: new Date(),
-            user: {
-              _id: 2,
-              name: 'React Native',
-              avatar: 'https://placeimg.com/140/140/any',
+        // User Authentication
+        this.authUnsubscribe = firebase
+          .auth()
+          .onAuthStateChanged(async (user) => {
+            if (!user) {
+              await firebase.auth().signInAnonymously();
+            }
+            this.setState({
+              uid: user.uid,
+              messages: [
+                {
+                  _id: 1,
+                  text: 'Hello developer',
+                  createdAt: new Date(),
+                  user: {
+                    _id: 2,
+                    name: 'React Native',
+                    avatar: 'https://placeimg.com/140/140/any',
+                  },
+                },
+                {
+                  _id: 2,
+                  text: `${name} has entered the chat.`,
+                  createdAt: new Date(),
+                  system: true,
+                 },
+              ],
+              user: {
+                _id: user.uid,
+                name: name,
+                avatar: 'https://placeimg.com/140/140/any'
             },
-          },
-          {
-            _id: 2,
-            text: `${name} has entered the chat.`,
-            createdAt: new Date(),
-            system: true,
-           },
-        ],
-        user: {
-          _id: user.uid,
-          name: name,
-          avatar: 'https://placeimg.com/140/140/any'
-      }
-    });
+            isConnected: true,
+          });
+      
+          this.unsubscribe = this.referenceChatMessages
+            .orderBy("createdAt", "desc")
+            .onSnapshot(this.onCollectionUpdate);
+          });          
+          this.saveMessages();
+          } else {
+            console.log('offline');
 
-    this.unsubscribe = this.referenceChatMessages
-      .orderBy("createdAt", "desc")
-      .onSnapshot(this.onCollectionUpdate);
-    });
+            // user is offline
+            this.setState({ isConnected: false });
+            //retrieve chat from asyncStorage
+            this.getMessages();
+          }
+        });
   }
 
   onCollectionUpdate = (querySnapshot) => {
@@ -158,8 +166,12 @@ export default class Chat extends React.Component {
   };
 
   componentWillUnmount() {
-    this.authUnsubscribe();
-    this.unsubscribe();
+    if (this.state.isConnected) {
+      // stops listening to authentication
+      this.authUnsubscribe();
+      // stops listening for changes
+      this.unsubscribe();
+    }
   }
 
   renderBubble(props) {
@@ -199,6 +211,7 @@ export default class Chat extends React.Component {
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
+          renderInputToolbar={this.renderInputToolbar.bind(this)}
           user={{
             _id: this.state.user._id,
             name: this.state.name,
