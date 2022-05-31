@@ -16,7 +16,7 @@ export default class CustomActions extends React.Component {
  
   imagePicker = async () => {
     // expo permission
-    const { status } = await Permissions.getAsync(Permissions.MEDIA_LIBRARY);
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     try {
       if (status === "granted") {
         // pick image

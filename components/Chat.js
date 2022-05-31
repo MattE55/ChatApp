@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Platform, KeyboardAvoidingView } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -108,8 +108,6 @@ export default class Chat extends React.Component {
   };
 
   componentDidMount() {
-    // Preloaded message to greet the developer
-    // Second message saying the user has entered the chat by username
     let name = this.props.route.params.name;
 
     this.props.navigation.setOptions({ title: name });
@@ -210,11 +208,6 @@ export default class Chat extends React.Component {
     return null;
   }
 
-  // displays the communication features
-  renderCustomActions = (props) => {
-    return <CustomActions {...props} />;
-  };
-
   addMessage() {
     const message = this.state.messages[0];
     
@@ -236,6 +229,11 @@ export default class Chat extends React.Component {
       this.addMessage();
       this.saveMessages();
     })
+  };
+
+   // displays the communication features
+   renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
   };
 
   render() {
