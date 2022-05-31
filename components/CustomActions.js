@@ -1,19 +1,22 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import { Image, Text, Button, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
-import firebase from 'firebase';
-import firestore from 'firebase';
-// import MapView from 'react-native-maps'
+//import firebase from 'firebase';
+//import firestore from 'firebase';
+//import MapView from 'react-native-maps'
+
+const firebase = require('firebase');
+require('firebase/firestore');
 
 
 export default class CustomActions extends React.Component {
  
   imagePicker = async () => {
     // expo permission
-    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+    const { status } = await Permissions.getAsync(Permissions.MEDIA_LIBRARY);
     try {
       if (status === "granted") {
         // pick image
@@ -34,7 +37,7 @@ export default class CustomActions extends React.Component {
   //lets the user take a photo
 
   takePhoto = async () => {
-    const { status } = await Permissions.askAsync(
+    const { status } = await Permissions.getAsync(
       Permissions.CAMERA,
       Permissions.MEDIA_LIBRARY
     );
@@ -56,8 +59,8 @@ export default class CustomActions extends React.Component {
 
   //get location of user using gps
   getLocation = async () => {
+      const { status } = await Permissions.getAsync(Permissions.LOCATION_FOREGROUND);
     try {
-      const { status } = await Permissions.askAsync(Permissions.LOCATION_FOREGROUND);
       if (status === "granted") {
         const result = await Location.getCurrentPositionAsync(
           {}
